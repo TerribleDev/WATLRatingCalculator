@@ -299,7 +299,7 @@
 		display: flex;
 		flex-direction: row;
 		gap: 0.5rem;
-		min-height: 3.1rem;
+		min-height: 7rem;
 		flex-wrap: wrap;
 	}
 	.flexrowButton  {
