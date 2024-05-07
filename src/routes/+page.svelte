@@ -11,6 +11,9 @@
 	function isKill(score: Score | undefined | null) {
 		return score === "killHit6" || score === "killHit8" || score === "killMiss";
 	}
+	function isDrop(score: Score | undefined | null) {
+		return score === "drop";
+	}
 	function addScore(score: Score) {
 		const targetGame = games[gameEditing];
 		targetGame.addScore(score);
@@ -83,20 +86,7 @@
 		return (totalHits / totalThrows); // Calculate hit percentage
 	}
 
-	function calculateKillsHit(games: Game[]): number {
-		let killsHit = 0;
-
-		for (const game of games) {
-			for (const score of game.scores) {
-				if (score === 'killHit6' || score === 'killHit8') {
-					killsHit++;
-				}
-			}
-		}
-
-		return killsHit; // Calculate total kills hit
-	}
-	function totalKills(games: Game[]) {
+	function calculateKillsHit(games: Game[]) {
 		return games.reduce((accum: number, current) => {
 			return current.stats.totalEightKills + current.stats.totalSixKills + accum;
 		}, 0)
@@ -190,19 +180,19 @@
 		}}>6</button
 	>
 	<button
-		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing))}
+		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing) && !isDrop(currentScoreEditing))}
 		on:click={() => {
 			setScore('killHit6');
 		}}>{getLabelForScore('killHit6')}</button
 	>
 	<button
-		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing))}
+		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing) && !isDrop(currentScoreEditing))}
 		on:click={() => {
 			setScore('killHit8');
 		}}>{getLabelForScore('killHit8')}</button
 	>
 	<button
-		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing))}
+		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing) && !isDrop(currentScoreEditing))}
 		on:click={() => {
 			setScore('killMiss');
 		}}>{getLabelForScore('killMiss')}</button
