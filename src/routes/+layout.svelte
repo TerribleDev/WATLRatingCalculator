@@ -11,5 +11,7 @@
 </body>
 
 <style>
-
+	body {
+		touch-action: manipulation;
+	}
 </style>
