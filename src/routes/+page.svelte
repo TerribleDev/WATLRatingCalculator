@@ -124,29 +124,29 @@
 			<div>
 				{#if scoreIndex === scoreEditing}
 					<button
+					 	class="outline"
 						on:click={() => {
 							scoreEditing = -1;
 						}}>Cancel</button
 					>
 				{:else}
-					<button on:click={() => (scoreEditing = scoreIndex)}>{getLabelForScore(score)}</button>
+					<button class="outline secondary" on:click={() => (scoreEditing = scoreIndex)}>{getLabelForScore(score)}</button>
 				{/if}
 			</div>
 		{/each}
-		{#if currentGameEditing.isComplete}
-			<button on:click={saveGame}>Save Game</button>
-		{/if}
 	</div>
 </section>
 <section>
-	<button
-		class="flexrowButton"
+	<div>
+		<button
+		class="flexrowButton "
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(0);
 		}}>0</button
 	>
 	<button
+		class="flexrowButton"
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(1);
@@ -160,76 +160,83 @@
 		}}>2</button
 	>
 	<button
-		class="flexrowButton"
+		class="flexrowButton "
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(3);
 		}}>3</button
 	>
 	<button
-		class="flexrowButton"
+		class="flexrowButton "
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(4);
 		}}>4</button
 	>
 	<button
-		class="flexrowButton"
+		class="flexrowButton "
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(5);
 		}}>5</button
 	>
 	<button
-		class="flexrowButton"
+		class="flexrowButton "
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(6);
 		}}>6</button
 	>
-	<button
-		class="flexrowButton"
-		disabled={disableEditing ||
-			(!currentGameEditing.KillEnabled &&
-				!isKill(currentScoreEditing) &&
-				!isDrop(currentScoreEditing))}
-		on:click={() => {
-			setScore('killHit6');
-		}}>{getLabelForScore('killHit6')}</button
-	>
-	<button
-		class="flexrowButton"
-		disabled={disableEditing ||
-			(!currentGameEditing.KillEnabled &&
-				!isKill(currentScoreEditing) &&
-				!isDrop(currentScoreEditing))}
-		on:click={() => {
-			setScore('killHit8');
-		}}>{getLabelForScore('killHit8')}</button
-	>
-	<button
-		class="flexrowButton"
-		disabled={disableEditing ||
-			(!currentGameEditing.KillEnabled &&
-				!isKill(currentScoreEditing) &&
-				!isDrop(currentScoreEditing))}
-		on:click={() => {
-			setScore('killMiss');
-		}}>{getLabelForScore('killMiss')}</button
-	>
-	<button
-		class="flexrowButton"
-		disabled={disableEditing}
-		on:click={() => {
-			setScore('drop');
-		}}>{getLabelForScore('drop')}</button
-	>
+	</div>
+	<div>
+		<button
+			class="flexrowButton "
+			disabled={disableEditing ||
+				(!currentGameEditing.KillEnabled &&
+					!isKill(currentScoreEditing) &&
+					!isDrop(currentScoreEditing))}
+			on:click={() => {
+				setScore('killHit6');
+			}}>{getLabelForScore('killHit6')}</button
+		>
+		<button
+			class="flexrowButton "
+			disabled={disableEditing ||
+				(!currentGameEditing.KillEnabled &&
+					!isKill(currentScoreEditing) &&
+					!isDrop(currentScoreEditing))}
+			on:click={() => {
+				setScore('killHit8');
+			}}>{getLabelForScore('killHit8')}</button
+		>
+		<button
+			class="flexrowButton "
+			disabled={disableEditing ||
+				(!currentGameEditing.KillEnabled &&
+					!isKill(currentScoreEditing) &&
+					!isDrop(currentScoreEditing))}
+			on:click={() => {
+				setScore('killMiss');
+			}}>{getLabelForScore('killMiss')}</button
+		>
+		<button
+			class="flexrowButton "
+			disabled={disableEditing}
+			on:click={() => {
+				setScore('drop');
+			}}>{getLabelForScore('drop')}</button
+		>
+		<!-- {#if currentGameEditing.isComplete} -->
+				<button disabled={!currentGameEditing.isComplete} class="contrast" on:click={saveGame}>Save Game</button>
+		<!-- {/if} -->
+	</div>
 </section>
+
 <section>
 	<h2>Past Games</h2>
-	<button on:click={deleteAllGames}>Delete All</button>
+	<button on:click={deleteAllGames}>Delete All</button><br /><br />
 	<p>
-		Rating: {calculateRating(gamesComplete)} Average: {calculateAverage(gamesComplete)} total kills:
+		Rating: {calculateRating(gamesComplete)} <br /> Average: {calculateAverage(gamesComplete)} <br /> total kills:
 		{calculateKillsHit(gamesComplete)}
 	</p>
 	<div class="overflow-auto">
@@ -293,8 +300,9 @@
 		flex-direction: row;
 		gap: 0.5rem;
 		min-height: 3.1rem;
+		flex-wrap: wrap;
 	}
-	.flexrowButton {
+	.flexrowButton  {
 		margin-bottom: 1rem;
 	}
 	/* mobile only */
