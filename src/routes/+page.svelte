@@ -140,6 +140,7 @@
 </section>
 <section>
 	<button
+		class="flexrowButton"
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(0);
@@ -152,54 +153,63 @@
 		}}>1</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(2);
 		}}>2</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(3);
 		}}>3</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(4);
 		}}>4</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(5);
 		}}>5</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing}
 		on:click={() => {
 			setScore(6);
 		}}>6</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing) && !isDrop(currentScoreEditing))}
 		on:click={() => {
 			setScore('killHit6');
 		}}>{getLabelForScore('killHit6')}</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing) && !isDrop(currentScoreEditing))}
 		on:click={() => {
 			setScore('killHit8');
 		}}>{getLabelForScore('killHit8')}</button
 	>
 	<button
+	class="flexrowButton"
 		disabled={disableEditing || (!currentGameEditing.KillEnabled && !isKill(currentScoreEditing) && !isDrop(currentScoreEditing))}
 		on:click={() => {
 			setScore('killMiss');
 		}}>{getLabelForScore('killMiss')}</button
 	>
 	<button
+	class="flexrowButton"
 	disabled={disableEditing}
 	on:click={() => {
 		setScore('drop');
@@ -236,8 +246,8 @@
 							on:click={() => {
 								gameEditing = game.gameId;
 							}}
-							>Edit</button></td>
-						<td><button
+							>Edit</button>
+							<button
 							disabled={game === currentGameEditing}
 							on:click={() => {
 								const newGames = $storedGames = $storedGames.filter((g, i) => i !== gameIndex);
@@ -247,7 +257,8 @@
 								$storedGames = newGames;
 								gameEditing = "";
 							}}
-							>Delete</button></td>
+							>Delete</button>
+						</td>
 					</tr>
 			{/each}
 		</tbody>
@@ -264,5 +275,8 @@
 		flex-direction: row;
 		gap: 0.5rem;
 		min-height: 3.1rem;
+	}
+	.flexrowButton {
+		margin-bottom: 1rem;
 	}
 </style>
