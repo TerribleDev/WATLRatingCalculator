@@ -243,6 +243,7 @@
 					<th>Kills 6</th>
 					<th>Drops</th>
 					<th></th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -261,6 +262,8 @@
 									gameEditing = game.gameId;
 								}}>Edit</button
 							>
+						</td>
+						<td>
 							<button
 								disabled={game === currentGameEditing}
 								on:click={() => {
@@ -291,10 +294,8 @@
 		gap: 0.5rem;
 		min-height: 3.1rem;
 	}
+	.flexrowButton {
+		margin-bottom: 1rem;
+	}
 	/* mobile only */
-	/* @media (max-width: 600px) {
-		.flexrowButton {
-			margin-bottom: 1rem;
-		}
-	} */
 </style>
