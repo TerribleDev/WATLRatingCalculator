@@ -118,7 +118,7 @@
 </svelte:head>
 <h1 class="center">WATL rating simulator</h1>
 <section>
-	<p>Current Game Score {currentGameEditing.totalScore}</p>
+	<div class="stats"><div>Score {currentGameEditing.totalScore}</div> <div>Throw: {currentGameEditing.scores.length}</div></div>
 	<div class="flexrow">
 		{#each currentGameEditing.scores as score, scoreIndex}
 			<div>
@@ -291,6 +291,11 @@
 </section>
 
 <style>
+	.stats {
+		display: flex;
+		justify-content: space-between;
+	
+	}
 	.center {
 		display: flex;
 		justify-content: center;
