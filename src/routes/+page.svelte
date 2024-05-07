@@ -244,6 +244,16 @@
 								gameEditing = gameIndex;
 							}}
 							>Edit</button></td>
+						<td><button
+							on:click={() => {
+								const newGames = games = games.filter((g, i) => i !== gameIndex);
+								if(newGames.length < 1) {
+									newGames.push(new Game())
+								}
+								games = newGames;
+								gameEditing = gameEditing > 0 ? gameEditing -1 : 0;
+							}}
+							>Delete</button></td>
 					</tr>
 				{/if}
 			{/each}
