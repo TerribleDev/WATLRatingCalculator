@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Game, type Score } from './interfaces';
+	import { storedGames } from './store';
 	export const ssr = false;
-	let games: Game[] = [new Game()];
-	let gameEditing = 0;
+	let gameEditing = "";
 	let scoreEditing = -1;
-	$: currentGameEditing = games[gameEditing];
+	$: currentGameEditing = (gameEditing && $storedGames.find(g => g.gameId === gameEditing)) || $storedGames[$storedGames.length - 1];
 	$: currentScoreEditing = scoreEditing > -1 ? currentGameEditing.scores[scoreEditing] : null;
-	$: gamesNotEditing = games.filter(i => i !== currentGameEditing)
+	$: gamesComplete = $storedGames.filter(g => g.isComplete);
 	$: disableEditing = currentGameEditing.isComplete && scoreEditing === -1;
 	function isKill(score: Score | undefined | null) {
 		return score === "killHit6" || score === "killHit8" || score === "killMiss";
@@ -15,15 +15,15 @@
 		return score === "drop";
 	}
 	function addScore(score: Score) {
-		const targetGame = games[gameEditing];
+		const targetGame = currentGameEditing;
 		targetGame.addScore(score);
-		games = [...games];
+		$storedGames = [...$storedGames];
 	}
 	function replaceScore(score: Score) {
 		const targetGame = currentGameEditing;
 		targetGame.replaceScore(scoreEditing, score);
 		scoreEditing = -1;
-		games = [...games];
+		$storedGames = [...$storedGames];
 	}
 	function setScore(score: Score) {
 		if (scoreEditing === -1) {
@@ -31,20 +31,20 @@
 		} else {
 			replaceScore(score);
 		}
-		games = [...games];
+		$storedGames = [...$storedGames];
 	}
 	function saveGame() {
 		if (!currentGameEditing.isComplete) {
 			return;
 		}
-		const lastGame = games[games.length - 1]
+		const lastGame = $storedGames[$storedGames.length - 1]
 		if(lastGame !== currentGameEditing) {
-			games = [...games];
+			$storedGames = [...$storedGames];
 		}
 		else {
-			games = [...games, new Game()]
+			$storedGames = [...$storedGames, new Game()]
 		}
-		gameEditing = games.length - 1;
+		gameEditing = "";
 		scoreEditing = -1;
 	}
 	function calculateAverage(gamesToCalculate: Game[]): number {
@@ -106,13 +106,15 @@
 				return "Drop";
 		}
 	}
+	function deleteAllGames() {
+		$storedGames = [new Game()];
+	}
 </script>
 
 <svelte:head>
 	<title>Home</title>
 	<meta name="description" content="Figure out ratings" />
 </svelte:head>
-
 <h1 class="center">WATL rating simulator</h1>
 <section>
 		<p>Current Game Score {currentGameEditing.totalScore}
@@ -206,7 +208,8 @@
 </section>
 <section>
 	<h2>Past Games</h2>
-	<p>Rating: {calculateRating(gamesNotEditing)} Average: {calculateAverage(gamesNotEditing)} total kills: {calculateKillsHit(gamesNotEditing)}</p>
+	<button on:click={deleteAllGames}>Delete All</button>
+	<p>Rating: {calculateRating(gamesComplete)} Average: {calculateAverage(gamesComplete)} total kills: {calculateKillsHit(gamesComplete)}</p>
 	<table class="striped">
 		<thead>
 			<tr>
@@ -220,8 +223,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each games as game, gameIndex}
-				{#if gameIndex !== gameEditing}
+			{#each $storedGames as game, gameIndex}
 					<tr>
 						<td>{gameIndex + 1}</td>
 						<td>{game.totalScore}</td>
@@ -230,22 +232,23 @@
 						<td>{game.stats.totalSixKills}</td>
 						<td>{game.stats.drops}</td>
 						<td><button
+							disabled={game === currentGameEditing}
 							on:click={() => {
-								gameEditing = gameIndex;
+								gameEditing = game.gameId;
 							}}
 							>Edit</button></td>
 						<td><button
+							disabled={game === currentGameEditing}
 							on:click={() => {
-								const newGames = games = games.filter((g, i) => i !== gameIndex);
+								const newGames = $storedGames = $storedGames.filter((g, i) => i !== gameIndex);
 								if(newGames.length < 1) {
 									newGames.push(new Game())
 								}
-								games = newGames;
-								gameEditing = gameEditing > 0 ? gameEditing -1 : 0;
+								$storedGames = newGames;
+								gameEditing = "";
 							}}
 							>Delete</button></td>
 					</tr>
-				{/if}
 			{/each}
 		</tbody>
 	</table>

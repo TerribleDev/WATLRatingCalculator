@@ -1,6 +1,12 @@
 export type Score = 8 | 6 | 5 | 4 | 3 | 2 | 1 | 0 | "drop" | "killHit8" | "killHit6" | "killMiss";
 export interface GameStats { totalSixKills: number; totalEightKills: number; killAttempts: number, drops: number, bulls: number}
-export class Game {
+export interface IStoredGame {
+    scores: Score[];
+    stats: GameStats;
+    gameId: string;
+}
+export class Game implements IStoredGame {
+    public gameId = Math.random().toString(36).substring(7);
     public scores: Score[] = [];
     public stats: GameStats = this.GenerateStats();
     public addScore(score: Score) {
