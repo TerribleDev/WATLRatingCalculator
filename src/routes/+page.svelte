@@ -9,7 +9,9 @@
 		$storedGames[$storedGames.length - 1];
 	$: currentScoreEditing = scoreEditing > -1 ? currentGameEditing.scores[scoreEditing] : null;
 	$: gamesComplete = $storedGames.filter((g) => g.isComplete);
+	$: completedStats = calculateTotalGameStats(gamesComplete);
 	$: disableEditing = currentGameEditing.isComplete && scoreEditing === -1;
+	$: storedGames;
 	function isKill(score: Score | undefined | null) {
 		return score === 'killHit6' || score === 'killHit8' || score === 'killMiss';
 	}
@@ -92,6 +94,39 @@
 			return current.stats.totalEightKills + current.stats.totalSixKills + accum;
 		}, 0);
 	}
+	// function calculateBullsHit(games: Game[]) {
+	// 	return games.reduce((accum: number, current) => {
+	// 		return current.stats.bulls + accum;
+	// 	}, 0);
+	// }
+	// function calculateTotalScore(games: Game[]) {
+	// 	return games.reduce((accum: number, current) => {
+	// 		return current.totalScore + accum;
+	// 	}, 0);
+	// }
+	function calculateTotalGameStats(gamesToCalc: Game[]) {
+		const stats = gamesToCalc.reduce(
+			(accum, current) => {
+				return {
+					bulls: current.stats.bulls + accum.bulls,
+					kills: current.stats.totalEightKills + current.stats.totalSixKills + accum.kills,
+					drops: current.stats.drops + accum.drops,
+					totalScore: current.totalScore + accum.totalScore
+				};
+			},
+			{ bulls: 0, kills: 0, drops: 0, totalScore: 0 } as {
+				bulls: number;
+				kills: number;
+				drops: number;
+				totalScore: number;
+			}
+		);
+		return {
+			...stats,
+			average: stats.totalScore && gamesToCalc.length ? stats.totalScore / gamesToCalc.length : 0,
+			rating: calculateRating(gamesToCalc)
+		};
+	}
 	function getLabelForScore(score: Score) {
 		if (typeof score === 'number') {
 			return score.toString();
@@ -118,19 +153,24 @@
 </svelte:head>
 <h1 class="center">WATL rating simulator</h1>
 <section>
-	<div class="stats"><div>Score {currentGameEditing.totalScore}</div> <div>Throw: {currentGameEditing.scores.length}</div></div>
+	<div class="stats">
+		<div>Score {currentGameEditing.totalScore}</div>
+		<div>Throw: {currentGameEditing.scores.length + 1}</div>
+	</div>
 	<div class="flexrow">
 		{#each currentGameEditing.scores as score, scoreIndex}
 			<div>
 				{#if scoreIndex === scoreEditing}
 					<button
-					 	class="outline"
+						class="outline"
 						on:click={() => {
 							scoreEditing = -1;
 						}}>Cancel</button
 					>
 				{:else}
-					<button class="outline secondary" on:click={() => (scoreEditing = scoreIndex)}>{getLabelForScore(score)}</button>
+					<button class="outline secondary" on:click={() => (scoreEditing = scoreIndex)}
+						>{getLabelForScore(score)}</button
+					>
 				{/if}
 			</div>
 		{/each}
@@ -139,58 +179,58 @@
 <section>
 	<div>
 		<button
-		class="flexrowButton "
-		disabled={disableEditing}
-		on:click={() => {
-			setScore(0);
-		}}>0</button
-	>
-	<button
-		class="flexrowButton"
-		disabled={disableEditing}
-		on:click={() => {
-			setScore(1);
-		}}>1</button
-	>
-	<button
-		class="flexrowButton"
-		disabled={disableEditing}
-		on:click={() => {
-			setScore(2);
-		}}>2</button
-	>
-	<button
-		class="flexrowButton "
-		disabled={disableEditing}
-		on:click={() => {
-			setScore(3);
-		}}>3</button
-	>
-	<button
-		class="flexrowButton "
-		disabled={disableEditing}
-		on:click={() => {
-			setScore(4);
-		}}>4</button
-	>
-	<button
-		class="flexrowButton "
-		disabled={disableEditing}
-		on:click={() => {
-			setScore(5);
-		}}>5</button
-	>
-	<button
-		class="flexrowButton "
-		disabled={disableEditing}
-		on:click={() => {
-			setScore(6);
-		}}>6</button
-	>
+			class="flexrowButton"
+			disabled={disableEditing}
+			on:click={() => {
+				setScore(0);
+			}}>0</button
+		>
+		<button
+			class="flexrowButton"
+			disabled={disableEditing}
+			on:click={() => {
+				setScore(1);
+			}}>1</button
+		>
+		<button
+			class="flexrowButton"
+			disabled={disableEditing}
+			on:click={() => {
+				setScore(2);
+			}}>2</button
+		>
+		<button
+			class="flexrowButton"
+			disabled={disableEditing}
+			on:click={() => {
+				setScore(3);
+			}}>3</button
+		>
+		<button
+			class="flexrowButton"
+			disabled={disableEditing}
+			on:click={() => {
+				setScore(4);
+			}}>4</button
+		>
+		<button
+			class="flexrowButton"
+			disabled={disableEditing}
+			on:click={() => {
+				setScore(5);
+			}}>5</button
+		>
+		<button
+			class="flexrowButton"
+			disabled={disableEditing}
+			on:click={() => {
+				setScore(6);
+			}}>6</button
+		>
 	</div>
 	<div>
 		<button
-			class="flexrowButton "
+			class="flexrowButton"
 			disabled={disableEditing ||
 				(!currentGameEditing.KillEnabled &&
 					!isKill(currentScoreEditing) &&
@@ -200,7 +240,7 @@
 			}}>{getLabelForScore('killHit6')}</button
 		>
 		<button
-			class="flexrowButton "
+			class="flexrowButton"
 			disabled={disableEditing ||
 				(!currentGameEditing.KillEnabled &&
 					!isKill(currentScoreEditing) &&
@@ -210,7 +250,7 @@
 			}}>{getLabelForScore('killHit8')}</button
 		>
 		<button
-			class="flexrowButton "
+			class="flexrowButton"
 			disabled={disableEditing ||
 				(!currentGameEditing.KillEnabled &&
 					!isKill(currentScoreEditing) &&
@@ -220,14 +260,16 @@
 			}}>{getLabelForScore('killMiss')}</button
 		>
 		<button
-			class="flexrowButton "
+			class="flexrowButton"
 			disabled={disableEditing}
 			on:click={() => {
 				setScore('drop');
 			}}>{getLabelForScore('drop')}</button
 		>
 		<!-- {#if currentGameEditing.isComplete} -->
-				<button disabled={!currentGameEditing.isComplete} class="contrast" on:click={saveGame}>Save Game</button>
+		<button disabled={!currentGameEditing.isComplete} class="contrast" on:click={saveGame}
+			>New Game</button
+		>
 		<!-- {/if} -->
 	</div>
 </section>
@@ -236,11 +278,14 @@
 	<h2>Past Games</h2>
 	<button on:click={deleteAllGames}>Delete All</button><br /><br />
 	<p>
-		Rating: {calculateRating(gamesComplete)} <br /> Average: {calculateAverage(gamesComplete)} <br /> total kills:
-		{calculateKillsHit(gamesComplete)}
+		Rating: {completedStats.rating} <br />
+		Average: {completedStats.average} <br />
+		Kills: {completedStats.kills} <br />
+		Bulls: {completedStats.bulls} <br />
+		Score: {completedStats.totalScore}
 	</p>
 	<div class="overflow-auto">
-		<table class="striped">
+		<table class="">
 			<thead>
 				<tr>
 					<th>Game</th>
@@ -255,35 +300,39 @@
 			</thead>
 			<tbody>
 				{#each $storedGames as game, gameIndex}
-					<tr>
-						<td class="tdSmall">{gameIndex + 1}</td>
-						<td class="tdSmall">{game.totalScore}</td>
-						<td class="tdSmall">{game.stats.bulls}</td>
-						<td class="tdSmall">{game.stats.totalEightKills}</td>
-						<td class="tdSmall">{game.stats.totalSixKills}</td>
-						<td class="tdSmall">{game.stats.drops}</td>
-						<td
-							><button
-								disabled={game === currentGameEditing}
-								on:click={() => {
-									gameEditing = game.gameId;
-								}}>Edit</button
-							>
-						</td>
-						<td>
-							<button
-								disabled={game === currentGameEditing}
-								on:click={() => {
-									const newGames = ($storedGames = $storedGames.filter((g, i) => i !== gameIndex));
-									if (newGames.length < 1) {
-										newGames.push(new Game());
-									}
-									$storedGames = newGames;
-									gameEditing = '';
-								}}>Delete</button
-							>
-						</td>
-					</tr>
+					{#if game.isComplete || (!game.isComplete && currentGameEditing !== game)}
+						<tr>
+							<td class="tdSmall">{gameIndex + 1}</td>
+							<td class="tdSmall">{game.totalScore}</td>
+							<td class="tdSmall">{game.stats.bulls}</td>
+							<td class="tdSmall">{game.stats.totalEightKills}</td>
+							<td class="tdSmall">{game.stats.totalSixKills}</td>
+							<td class="tdSmall">{game.stats.drops}</td>
+							<td
+								><button
+									disabled={game === currentGameEditing}
+									on:click={() => {
+										gameEditing = game.gameId;
+									}}>Edit</button
+								>
+							</td>
+							<td>
+								<button
+									disabled={game === currentGameEditing}
+									on:click={() => {
+										const newGames = ($storedGames = $storedGames.filter(
+											(g, i) => i !== gameIndex
+										));
+										if (newGames.length < 1) {
+											newGames.push(new Game());
+										}
+										$storedGames = newGames;
+										gameEditing = '';
+									}}>Delete</button
+								>
+							</td>
+						</tr>
+					{/if}
 				{/each}
 			</tbody>
 		</table>
@@ -294,7 +343,6 @@
 	.stats {
 		display: flex;
 		justify-content: space-between;
-	
 	}
 	.center {
 		display: flex;
@@ -307,7 +355,7 @@
 		min-height: 7rem;
 		flex-wrap: wrap;
 	}
-	.flexrowButton  {
+	.flexrowButton {
 		margin-bottom: 1rem;
 	}
 	/* mobile only */
