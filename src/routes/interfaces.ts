@@ -6,6 +6,11 @@ export interface GameStats {
 	drops: number;
 	bulls: number;
 }
+export interface GameRatingData {
+	game: Game;
+	rating: number;
+	totalRating: number;
+}
 export interface IStoredGame {
 	scores: Score[];
 	stats: GameStats;

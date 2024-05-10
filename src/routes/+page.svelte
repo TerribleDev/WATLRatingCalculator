@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Game, type Score } from './interfaces';
+	import { Game, type GameRatingData, type Score } from './interfaces';
 	import { storedGames } from './store';
 	export const ssr = false;
 	let gameEditing = '';
@@ -9,9 +9,21 @@
 		$storedGames[$storedGames.length - 1];
 	$: currentScoreEditing = scoreEditing > -1 ? currentGameEditing.scores[scoreEditing] : null;
 	$: gamesComplete = $storedGames.filter((g) => g.isComplete);
+	$: gamesCompletedWithRating = calculateRatingForGames(gamesComplete);
 	$: completedStats = calculateTotalGameStats(gamesComplete);
 	$: disableEditing = currentGameEditing.isComplete && scoreEditing === -1;
 	$: storedGames;
+	function calculateRatingForGames(games: Game[]): GameRatingData[] {
+		return games.map((g, index) => {
+			const allGamesFromThisPointBack = games.slice(0, index + 1);
+			const totalRating = calculateRating(allGamesFromThisPointBack);
+			return {
+				game: g,
+				rating: calculateRating([g]),
+				totalRating: totalRating ? Math.round(totalRating * 10000) / 10000 : 0
+			};
+		});
+	}
 	function isKill(score: Score | undefined | null) {
 		return score === 'killHit6' || score === 'killHit8' || score === 'killMiss';
 	}
@@ -56,6 +68,20 @@
 		}
 		const totalScore = gamesToCalculate.reduce((acc, g) => acc + g.totalScore, 0);
 		return totalScore / gamesToCalculate.length;
+	}
+	function checkDiff(games: GameRatingData[], targetGameIndex: number): '👆' | '👇' | '-' {
+		const targetGame = games[targetGameIndex];
+		const previousGame = games[targetGameIndex - 1];
+		if (!previousGame) {
+			return '-';
+		}
+		if (targetGame.totalRating > previousGame.totalRating) {
+			return '👆';
+		}
+		if (targetGame.totalRating < previousGame.totalRating) {
+			return '👇';
+		}
+		return '-';
 	}
 	function calculateRating(gamesToCalculate: Game[]): number {
 		const totalGames = gamesToCalculate.length;
@@ -121,10 +147,15 @@
 				totalScore: number;
 			}
 		);
+		const rating = calculateRating(gamesToCalc);
 		return {
 			...stats,
-			average: stats.totalScore && gamesToCalc.length ? stats.totalScore / gamesToCalc.length : 0,
-			rating: calculateRating(gamesToCalc)
+			average:
+				stats.totalScore && gamesToCalc.length
+					? Math.round((stats.totalScore / gamesToCalc.length) * 10000) / 10000
+					: 0,
+			rating: rating ? Math.round(rating * 100) / 100 : 0,
+			totalGames: gamesToCalc.length
 		};
 	}
 	function getLabelForScore(score: Score) {
@@ -279,6 +310,7 @@
 	<button on:click={deleteAllGames}>Delete All</button><br /><br />
 	<p>
 		Rating: {completedStats.rating} <br />
+		Games: {completedStats.totalGames} <br />
 		Average: {completedStats.average} <br />
 		Kills: {completedStats.kills} <br />
 		Bulls: {completedStats.bulls} <br />
@@ -294,12 +326,14 @@
 					<th>Kills 8</th>
 					<th>Kills 6</th>
 					<th>Drops</th>
+					<th>Rating</th>
+					<th>Total Rating</th>
 					<th></th>
 					<th></th>
 				</tr>
 			</thead>
 			<tbody>
-				{#each $storedGames as game, gameIndex}
+				{#each gamesCompletedWithRating as { game, rating, totalRating }, gameIndex}
 					{#if game.isComplete || (!game.isComplete && currentGameEditing !== game)}
 						<tr>
 							<td class="tdSmall">{gameIndex + 1}</td>
@@ -308,6 +342,10 @@
 							<td class="tdSmall">{game.stats.totalEightKills}</td>
 							<td class="tdSmall">{game.stats.totalSixKills}</td>
 							<td class="tdSmall">{game.stats.drops}</td>
+							<td class="tdSmall">{rating}</td>
+							<td class="tdSmall"
+								>{checkDiff(gamesCompletedWithRating, gameIndex)} &nbsp; &nbsp; {totalRating}</td
+							>
 							<td
 								><button
 									disabled={game === currentGameEditing}
@@ -343,17 +381,19 @@
 	.stats {
 		display: flex;
 		justify-content: space-between;
+		margin-bottom: 2rem;
 	}
 	.center {
 		display: flex;
 		justify-content: center;
 	}
 	.flexrow {
-		display: flex;
-		flex-direction: row;
-		gap: 0.5rem;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+		row-gap: 0.5rem;
+		column-gap: 0.75rem;
 		min-height: 7rem;
-		flex-wrap: wrap;
+		width: fit-content;
 	}
 	.flexrowButton {
 		margin-bottom: 1rem;
