@@ -186,7 +186,11 @@
 <section>
 	<div class="stats">
 		<div>Score {currentGameEditing.totalScore}</div>
-		<div>Throw: {currentGameEditing.scores.length + 1}</div>
+		<div>
+			Throw: {currentGameEditing.scores.length < 10
+				? currentGameEditing.scores.length + 1
+				: currentGameEditing.scores.length}
+		</div>
 	</div>
 	<div class="flexrow">
 		{#each currentGameEditing.scores as score, scoreIndex}
@@ -199,7 +203,7 @@
 						}}>Cancel</button
 					>
 				{:else}
-					<button class="outline secondary" on:click={() => (scoreEditing = scoreIndex)}
+					<button class="outline secondary scorebtn" on:click={() => (scoreEditing = scoreIndex)}
 						>{getLabelForScore(score)}</button
 					>
 				{/if}
@@ -378,6 +382,9 @@
 </section>
 
 <style>
+	.scorebtn {
+		min-width: 4.25rem;
+	}
 	.stats {
 		display: flex;
 		justify-content: space-between;
