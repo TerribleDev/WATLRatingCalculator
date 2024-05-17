@@ -10,6 +10,7 @@
 	$: currentScoreEditing = scoreEditing > -1 ? currentGameEditing.scores[scoreEditing] : null;
 	$: gamesComplete = $storedGames.filter((g) => g.isComplete);
 	$: gamesCompletedWithRating = calculateRatingForGames(gamesComplete);
+	$: currentGameRating = calculateRating([currentGameEditing]);
 	$: completedStats = calculateTotalGameStats(gamesComplete);
 	$: disableEditing = currentGameEditing.isComplete && scoreEditing === -1;
 	$: storedGames;
@@ -186,6 +187,9 @@
 <section>
 	<div class="stats">
 		<div>Score {currentGameEditing.totalScore}</div>
+		<div>
+			Rating: {currentGameRating}
+		</div>
 		<div>
 			Throw: {currentGameEditing.scores.length < 10
 				? currentGameEditing.scores.length + 1
